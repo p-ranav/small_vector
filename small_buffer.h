@@ -31,6 +31,25 @@ public:
     index_ = count;
   }
 
+  small_buffer(const small_buffer& other) :
+    stack_(other.stack_), heap_(other.heap_), index_(other.index_) {}
+
+  small_buffer(small_buffer&& other) :
+    stack_(std::move(other.stack_)), heap_(std::move(other.heap_)), index_(std::move(other.index_)) {}
+
+  small_buffer(std::initializer_list<T> init) {
+    std::size_t i = 0;
+    for (const auto& v : init) {
+      if (i < N) {
+        stack_[i] = v;
+      } else {
+        heap_.emplace_back(v);
+      }
+      i += 1;
+    }
+    index_ = init.size();
+  }
+
   void push_back(const T& value) {
     if (index_ < N) {
       stack_[index_] = value;
