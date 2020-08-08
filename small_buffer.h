@@ -163,6 +163,14 @@ public:
     return index_;
   }
 
+  size_type stack_size() const {
+    return N;
+  }
+
+  size_type heap_size() const {
+    return heap_.size();
+  }
+
   void shrink_to_fit() {
     if (index_ >= N) {
       heap_.shrink_to_fit();
