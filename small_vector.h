@@ -1,22 +1,24 @@
 #pragma once
 #include <array>
 #include <vector>
+#include <iostream>
 
-template <class T, std::size_t N, class ST = std::size_t>
-class small_buffer {
+template <class T, std::size_t N, class Allocator = std::allocator<T>>
+class small_vector {
   std::array<T, N> stack_;
-  std::vector<T> heap_;
-  ST index_{0};
+  std::vector<T, Allocator> heap_;
+  std::size_t index_{0};
 
 public:
   typedef T value_type;
-  typedef ST size_type;
+  typedef std::size_t size_type;
   typedef value_type& reference;
   typedef const value_type& const_reference;
+  typedef Allocator allocator_type;
 
-  small_buffer() = default;
+  small_vector() = default;
 
-  explicit small_buffer(size_type count,
+  explicit small_vector(size_type count,
                         const T& value = T()) {
     if (count == N) {
       stack_.fill(value);
@@ -31,13 +33,13 @@ public:
     index_ = count;
   }
 
-  small_buffer(const small_buffer& other) :
+  small_vector(const small_vector& other) :
     stack_(other.stack_), heap_(other.heap_), index_(other.index_) {}
 
-  small_buffer(small_buffer&& other) :
+  small_vector(small_vector&& other) :
     stack_(std::move(other.stack_)), heap_(std::move(other.heap_)), index_(std::move(other.index_)) {}
 
-  small_buffer(std::initializer_list<T> init) {
+  small_vector(std::initializer_list<T> init) {
     std::size_t i = 0;
     for (const auto& v : init) {
       if (i < N) {
@@ -48,6 +50,38 @@ public:
       i += 1;
     }
     index_ = init.size();
+  }
+
+  small_vector& operator=(const small_vector& rhs) {
+    stack_ = rhs.stack_;
+    heap_ = rhs.heap_;
+    index_ = rhs.index_;
+    return *this;
+  }
+
+  small_vector& operator=(small_vector&& rhs) {
+    std::cout << "In move assignment\n";
+    stack_ = std::move(rhs.stack_);
+    heap_ = std::move(rhs.heap_);
+    index_ = std::move(rhs.index_);
+    return *this;
+  }
+
+  small_vector& operator=(std::initializer_list<value_type> rhs) {
+    index_ = 0;
+    heap_.clear();
+
+    std::size_t i = 0;
+    for (const auto& v : rhs) {
+      if (i < N) {
+        stack_[i] = v;
+      } else {
+        heap_.emplace_back(v);
+      }
+      i += 1;
+    }
+    index_ = rhs.size();
+    return *this;
   }
 
   void push_back(const T& value) {
@@ -194,7 +228,7 @@ public:
     index_ = count;
   }
 
-  void swap(small_buffer& other) noexcept {
+  void swap(small_vector& other) noexcept {
     stack_.swap(other.stack_);
     heap_.swap(other.heap_);
     index_ = other.index_;
