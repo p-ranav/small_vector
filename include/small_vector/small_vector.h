@@ -3,6 +3,8 @@
 #include <vector>
 #include <iostream>
 
+namespace sv {
+
 template <class T, std::size_t N, class Allocator = std::allocator<T>>
 class small_vector {
   std::array<T, N> stack_;
@@ -19,7 +21,8 @@ public:
   small_vector() = default;
 
   explicit small_vector(size_type count,
-                        const T& value = T()) {
+                        const T& value = T(),
+                        const Allocator& alloc = Allocator()) {
     if (count == N) {
       stack_.fill(value);
     } else if (count < N) {
@@ -28,28 +31,35 @@ public:
       }
     } else if (count > N) {
       stack_.fill(value);
-      heap_ = std::move(std::vector<T>(count - N, value));
+      heap_ = std::move(std::vector<T>(count - N, value, alloc));
     }
     index_ = count;
   }
 
-  small_vector(const small_vector& other) :
-    stack_(other.stack_), heap_(other.heap_), index_(other.index_) {}
+  small_vector(const small_vector& other, const Allocator& alloc = Allocator()) :
+    stack_(other.stack_), heap_(other.heap_, alloc), index_(other.index_) {}
 
-  small_vector(small_vector&& other) :
-    stack_(std::move(other.stack_)), heap_(std::move(other.heap_)), index_(std::move(other.index_)) {}
+  small_vector(small_vector&& other, const Allocator& alloc = Allocator()) :
+    stack_(std::move(other.stack_)), heap_(std::move(other.heap_), alloc), index_(std::move(other.index_)) {}
 
-  small_vector(std::initializer_list<T> init) {
+  small_vector(std::initializer_list<T> init, const Allocator& alloc = Allocator()) {
+    // Save to stack for first N elements
     std::size_t i = 0;
     for (const auto& v : init) {
       if (i < N) {
         stack_[i] = v;
       } else {
-        heap_.emplace_back(v);
+        break;
       }
       i += 1;
     }
-    index_ = init.size();
+
+    // Construct vector in heap for rest
+    const auto input_size = init.size();
+    if (input_size >= N) {
+      heap_ = std::move(std::vector<T>(init.begin() + N, init.end(), alloc));
+    }
+    index_ = input_size;
   }
 
   small_vector& operator=(const small_vector& rhs) {
@@ -243,3 +253,5 @@ public:
   }
 
 };
+
+}
