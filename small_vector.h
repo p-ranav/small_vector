@@ -1,7 +1,6 @@
 #pragma once
 #include <array>
 #include <vector>
-#include <iostream>
 
 template <class T, std::size_t N, class ST = std::size_t>
 class small_vector {
@@ -53,6 +52,22 @@ public:
       return stack_[pos];
     } else {
       return heap_[pos - N];
+    }
+  }
+
+  reference at(size_type pos) {
+    if (pos < N) {
+      return stack_[pos];
+    } else {
+      return heap_.at(pos - N);
+    }
+  }
+
+  const_reference at(size_type pos) const {
+    if (pos < N) {
+      return stack_[pos];
+    } else {
+      return heap_.at(pos - N);
     }
   }
 
