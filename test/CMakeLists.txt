@@ -29,6 +29,9 @@ file(GLOB SMALL_VECTOR_TEST_SOURCES
     test_iterators.cpp
     test_access.cpp
     test_sizing.cpp
+    test_swap.cpp
+    test_fill.cpp
+    test_push_pop.cpp
 )
 set_source_files_properties(main.cpp
     PROPERTIES

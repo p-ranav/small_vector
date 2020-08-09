@@ -81,8 +81,10 @@ public:
     if (size_ < N) {
       stack_[size_] = value;
     } else {
-      // move everything to heap
-      std::move(stack_.begin(), stack_.end(), std::back_inserter(heap_));
+      if (size_ == N) {
+        // move everything to heap
+        std::move(stack_.begin(), stack_.end(), std::back_inserter(heap_));
+      }
       heap_.push_back(value);
     }
     size_ += 1;
@@ -92,14 +94,21 @@ public:
     if (size_ < N) {
       stack_[size_] = std::move(value);
     } else {
-      // move everything to heap
-      std::move(stack_.begin(), stack_.end(), std::back_inserter(heap_));
+      if (size_ == N) {
+        // move everything to heap
+        std::move(stack_.begin(), stack_.end(), std::back_inserter(heap_));
+      }
       heap_.push_back(std::move(value));
     }
     size_ += 1;
   }
 
   void pop_back() {
+    if (size_ == 0) {
+      // do nothing
+      return;
+    }
+
     if (size_ < N) {
       size_ -= 1;
     } else {
@@ -234,9 +243,9 @@ public:
   }
 
   void swap(small_vector& other) noexcept {
-    stack_.swap(other.stack_);
-    heap_.swap(other.heap_);
-    size_ = other.size_;
+    std::swap(stack_, other.stack_);
+    std::swap(heap_, other.heap_);
+    std::swap(size_, other.size_);
   };
 
   // Assigns the given value value to all elements in the container
