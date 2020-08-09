@@ -271,7 +271,7 @@ public:
       ptr_++;
       return *this;
     }
-    self_type operator++(int junk) {
+    self_type operator++(int) {
       self_type i = *this;
       ptr_++;
       return i;
@@ -297,7 +297,7 @@ public:
       ptr_++;
       return *this;
     }
-    self_type operator++(int junk) {
+    self_type operator++(int) {
       self_type i = *this;
       ptr_++;
       return i;
