@@ -1,12 +1,11 @@
 #pragma once
 #include <array>
-#include <vector>
 #include <iostream>
+#include <vector>
 
 namespace sv {
 
-template <class T, std::size_t N, class Allocator = std::allocator<T>>
-class small_vector {
+template <class T, std::size_t N, class Allocator = std::allocator<T>> class small_vector {
   std::array<T, N> stack_;
   std::vector<T, Allocator> heap_;
   std::size_t size_{0};
@@ -14,15 +13,14 @@ class small_vector {
 public:
   typedef T value_type;
   typedef std::size_t size_type;
-  typedef value_type& reference;
-  typedef const value_type& const_reference;
+  typedef value_type &reference;
+  typedef const value_type &const_reference;
   typedef Allocator allocator_type;
 
   small_vector() = default;
 
-  explicit small_vector(size_type count,
-                        const T& value = T(),
-                        const Allocator& alloc = Allocator()) {
+  explicit small_vector(size_type count, const T &value = T(),
+                        const Allocator &alloc = Allocator()) {
     if (count == N) {
       stack_.fill(value);
     } else if (count < N) {
@@ -36,13 +34,14 @@ public:
     size_ = count;
   }
 
-  small_vector(const small_vector& other, const Allocator& alloc = Allocator()) :
-    stack_(other.stack_), heap_(other.heap_, alloc), size_(other.size_) {}
+  small_vector(const small_vector &other, const Allocator &alloc = Allocator())
+      : stack_(other.stack_), heap_(other.heap_, alloc), size_(other.size_) {}
 
-  small_vector(small_vector&& other, const Allocator& alloc = Allocator()) :
-    stack_(std::move(other.stack_)), heap_(std::move(other.heap_), alloc), size_(std::move(other.size_)) {}
+  small_vector(small_vector &&other, const Allocator &alloc = Allocator())
+      : stack_(std::move(other.stack_)), heap_(std::move(other.heap_), alloc),
+        size_(std::move(other.size_)) {}
 
-  small_vector(std::initializer_list<T> initlist, const Allocator& alloc = Allocator()) {
+  small_vector(std::initializer_list<T> initlist, const Allocator &alloc = Allocator()) {
     const auto input_size = initlist.size();
     if (input_size <= N) {
       std::copy(initlist.begin(), initlist.end(), stack_.begin());
@@ -52,21 +51,21 @@ public:
     size_ = input_size;
   }
 
-  small_vector& operator=(const small_vector& rhs) {
+  small_vector &operator=(const small_vector &rhs) {
     stack_ = rhs.stack_;
     heap_ = rhs.heap_;
     size_ = rhs.size_;
     return *this;
   }
 
-  small_vector& operator=(small_vector&& rhs) {
+  small_vector &operator=(small_vector &&rhs) {
     stack_ = std::move(rhs.stack_);
     heap_ = std::move(rhs.heap_);
     size_ = std::move(rhs.size_);
     return *this;
   }
 
-  small_vector& operator=(std::initializer_list<value_type> rhs) {
+  small_vector &operator=(std::initializer_list<value_type> rhs) {
     if (rhs.size() <= N) {
       stack_ = rhs;
     } else {
@@ -75,7 +74,7 @@ public:
     size_ = rhs.size();
   }
 
-  void push_back(const T& value) {
+  void push_back(const T &value) {
     if (size_ < N) {
       stack_[size_] = value;
     } else {
@@ -88,7 +87,7 @@ public:
     size_ += 1;
   }
 
-  void push_back(T&& value) {
+  void push_back(T &&value) {
     if (size_ < N) {
       stack_[size_] = std::move(value);
     } else {
@@ -186,7 +185,7 @@ public:
     }
   }
 
-  T* data() noexcept {
+  T *data() noexcept {
     if (size_ < N) {
       return stack_.data();
     } else {
@@ -194,7 +193,7 @@ public:
     }
   }
 
-  const T* data() const noexcept {
+  const T *data() const noexcept {
     if (size_ < N) {
       return stack_.data();
     } else {
@@ -202,13 +201,9 @@ public:
     }
   }
 
-  bool empty() const {
-    return size_ == 0;
-  }
+  bool empty() const { return size_ == 0; }
 
-  size_type size() const {
-    return size_;
-  }
+  size_type size() const { return size_; }
 
   void shrink_to_fit() {
     if (size_ >= N) {
@@ -240,7 +235,7 @@ public:
     size_ = count;
   }
 
-  void swap(small_vector& other) noexcept {
+  void swap(small_vector &other) noexcept {
     std::swap(stack_, other.stack_);
     std::swap(heap_, other.heap_);
     std::swap(size_, other.size_);
@@ -256,39 +251,55 @@ public:
   }
 
   class iterator {
-    T* ptr_;
+    T *ptr_;
+
   public:
     typedef iterator self_type;
     typedef T value_type;
-    typedef T& reference;
-    typedef T* pointer;
+    typedef T &reference;
+    typedef T *pointer;
     typedef std::forward_iterator_tag iterator_category;
     typedef int difference_type;
-    iterator(pointer ptr) : ptr_(ptr) { }
-    self_type operator++() { ptr_++; return *this; }
-    self_type operator++(int junk) { self_type i = *this; ptr_++; return i; }
+    iterator(pointer ptr) : ptr_(ptr) {}
+    self_type operator++() {
+      ptr_++;
+      return *this;
+    }
+    self_type operator++(int junk) {
+      self_type i = *this;
+      ptr_++;
+      return i;
+    }
     reference operator*() { return *ptr_; }
     pointer operator->() { return ptr_; }
-    bool operator==(const self_type& rhs) { return ptr_ == rhs.ptr_; }
-    bool operator!=(const self_type& rhs) { return ptr_ != rhs.ptr_; }
+    bool operator==(const self_type &rhs) { return ptr_ == rhs.ptr_; }
+    bool operator!=(const self_type &rhs) { return ptr_ != rhs.ptr_; }
   };
 
   class const_iterator {
-    T* ptr_;
+    T *ptr_;
+
   public:
     typedef const_iterator self_type;
     typedef T value_type;
-    typedef T& reference;
-    typedef T* pointer;
+    typedef T &reference;
+    typedef T *pointer;
     typedef int difference_type;
     typedef std::forward_iterator_tag iterator_category;
-    const_iterator(pointer ptr) : ptr_(ptr) { }
-    self_type operator++() { ptr_++; return *this; }
-    self_type operator++(int junk) { self_type i = *this; ptr_++; return i; }
-    const value_type& operator*() { return *ptr_; }
+    const_iterator(pointer ptr) : ptr_(ptr) {}
+    self_type operator++() {
+      ptr_++;
+      return *this;
+    }
+    self_type operator++(int junk) {
+      self_type i = *this;
+      ptr_++;
+      return i;
+    }
+    const value_type &operator*() { return *ptr_; }
     const pointer operator->() { return ptr_; }
-    bool operator==(const self_type& rhs) { return ptr_ == rhs.ptr_; }
-    bool operator!=(const self_type& rhs) { return ptr_ != rhs.ptr_; }
+    bool operator==(const self_type &rhs) { return ptr_ == rhs.ptr_; }
+    bool operator!=(const self_type &rhs) { return ptr_ != rhs.ptr_; }
   };
 
   iterator begin() {
@@ -322,7 +333,6 @@ public:
       return const_iterator(heap_.data() + size_);
     }
   }
-
 };
 
-}
+} // namespace sv
