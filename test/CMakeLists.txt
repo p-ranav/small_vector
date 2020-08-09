@@ -26,6 +26,9 @@ endif()
 file(GLOB SMALL_VECTOR_TEST_SOURCES
     main.cpp
     test_constructors.cpp
+    test_iterators.cpp
+    test_access.cpp
+    test_sizing.cpp
 )
 set_source_files_properties(main.cpp
     PROPERTIES
