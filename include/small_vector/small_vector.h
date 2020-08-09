@@ -16,6 +16,8 @@ public:
   typedef value_type &reference;
   typedef const value_type &const_reference;
   typedef Allocator allocator_type;
+  typedef T* pointer;
+  typedef const T* const_pointer;
 
   small_vector() = default;
 
@@ -74,51 +76,8 @@ public:
     size_ = rhs.size();
   }
 
-  void push_back(const T &value) {
-    if (size_ < N) {
-      stack_[size_] = value;
-    } else {
-      if (size_ == N) {
-        // move everything to heap
-        std::move(stack_.begin(), stack_.end(), std::back_inserter(heap_));
-      }
-      heap_.push_back(value);
-    }
-    size_ += 1;
-  }
-
-  void push_back(T &&value) {
-    if (size_ < N) {
-      stack_[size_] = std::move(value);
-    } else {
-      if (size_ == N) {
-        // move everything to heap
-        std::move(stack_.begin(), stack_.end(), std::back_inserter(heap_));
-      }
-      heap_.push_back(std::move(value));
-    }
-    size_ += 1;
-  }
-
-  void pop_back() {
-    if (size_ == 0) {
-      // do nothing
-      return;
-    }
-
-    if (size_ < N) {
-      size_ -= 1;
-    } else {
-      // currently using heap
-      heap_.pop_back();
-      size_ -= 1;
-
-      // now check if all data can fit on stack
-      // if so, move back to stack
-      if (size_ < N) {
-        std::move(heap_.begin(), heap_.end(), stack_.begin());
-      }
-    }
+  allocator_type get_allocator() const noexcept {
+    return heap_.get_allocator();
   }
 
   reference at(size_type pos) {
@@ -185,7 +144,7 @@ public:
     }
   }
 
-  T *data() noexcept {
+  pointer data() noexcept {
     if (size_ < N) {
       return stack_.data();
     } else {
@@ -193,7 +152,7 @@ public:
     }
   }
 
-  const T *data() const noexcept {
+  const_pointer data() const noexcept {
     if (size_ < N) {
       return stack_.data();
     } else {
@@ -208,6 +167,53 @@ public:
   void shrink_to_fit() {
     if (size_ >= N) {
       heap_.shrink_to_fit();
+    }
+  }
+
+  void push_back(const T &value) {
+    if (size_ < N) {
+      stack_[size_] = value;
+    } else {
+      if (size_ == N) {
+        // move everything to heap
+        std::move(stack_.begin(), stack_.end(), std::back_inserter(heap_));
+      }
+      heap_.push_back(value);
+    }
+    size_ += 1;
+  }
+
+  void push_back(T &&value) {
+    if (size_ < N) {
+      stack_[size_] = std::move(value);
+    } else {
+      if (size_ == N) {
+        // move everything to heap
+        std::move(stack_.begin(), stack_.end(), std::back_inserter(heap_));
+      }
+      heap_.push_back(std::move(value));
+    }
+    size_ += 1;
+  }
+
+  void pop_back() {
+    if (size_ == 0) {
+      // do nothing
+      return;
+    }
+
+    if (size_ < N) {
+      size_ -= 1;
+    } else {
+      // currently using heap
+      heap_.pop_back();
+      size_ -= 1;
+
+      // now check if all data can fit on stack
+      // if so, move back to stack
+      if (size_ < N) {
+        std::move(heap_.begin(), heap_.end(), stack_.begin());
+      }
     }
   }
 
@@ -251,7 +257,7 @@ public:
   }
 
   class iterator {
-    T *ptr_;
+    pointer ptr_;
 
   public:
     typedef iterator self_type;
@@ -277,7 +283,7 @@ public:
   };
 
   class const_iterator {
-    T *ptr_;
+    pointer ptr_;
 
   public:
     typedef const_iterator self_type;
