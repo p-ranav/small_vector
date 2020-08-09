@@ -17,7 +17,7 @@ int main() {
   // This small vector can hold up to 4 items on the stack
   small_vector<int, 4> vec{1, 2, 3, 4};
   
-  // It will automatically move its contents to the heap if
+  // It will move its contents to the heap if it
   // contains more than four items:
   vec.push_back(5);
   
