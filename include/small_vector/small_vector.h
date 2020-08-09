@@ -17,8 +17,6 @@ public:
   typedef value_type& reference;
   typedef const value_type& const_reference;
   typedef Allocator allocator_type;
-  typedef T* iterator;
-  typedef const T* const_iterator;
 
   small_vector() = default;
 
@@ -256,6 +254,75 @@ public:
       std::fill(heap_.begin(), heap_.end(), value);
     }
   }
+
+  class iterator {
+    T* ptr_;
+  public:
+    typedef iterator self_type;
+    typedef T value_type;
+    typedef T& reference;
+    typedef T* pointer;
+    typedef std::forward_iterator_tag iterator_category;
+    typedef int difference_type;
+    iterator(pointer ptr) : ptr_(ptr) { }
+    self_type operator++() { self_type i = *this; ptr_++; return i; }
+    self_type operator++(int junk) { ptr_++; return *this; }
+    reference operator*() { return *ptr_; }
+    pointer operator->() { return ptr_; }
+    bool operator==(const self_type& rhs) { return ptr_ == rhs.ptr_; }
+    bool operator!=(const self_type& rhs) { return ptr_ != rhs.ptr_; }
+  };
+
+  class const_iterator {
+    T* ptr_;
+  public:
+    typedef const_iterator self_type;
+    typedef T value_type;
+    typedef T& reference;
+    typedef T* pointer;
+    typedef int difference_type;
+    typedef std::forward_iterator_tag iterator_category;
+    const_iterator(pointer ptr) : ptr_(ptr) { }
+    self_type operator++() { self_type i = *this; ptr_++; return i; }
+    self_type operator++(int junk) { ptr_++; return *this; }
+    const value_type& operator*() { return *ptr_; }
+    const pointer operator->() { return ptr_; }
+    bool operator==(const self_type& rhs) { return ptr_ == rhs.ptr_; }
+    bool operator!=(const self_type& rhs) { return ptr_ != rhs.ptr_; }
+  };
+
+  iterator begin() {
+    if (size_ < N) {
+      return iterator(stack_.data());
+    } else {
+      return iterator(heap_.data());
+    }
+  }
+
+  iterator end() {
+    if (size_ < N) {
+      return iterator(stack_.data() + size_);
+    } else {
+      return iterator(heap_.data() + size_);
+    }
+  }
+
+  const_iterator begin() const {
+    if (size_ < N) {
+      return const_iterator(stack_.data());
+    } else {
+      return const_iterator(heap_.data());
+    }
+  }
+
+  const_iterator end() const {
+    if (size_ < N) {
+      return const_iterator(stack_.data() + size_);
+    } else {
+      return const_iterator(heap_.data() + size_);
+    }
+  }
+
 };
 
 }
