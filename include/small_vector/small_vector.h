@@ -16,8 +16,8 @@ public:
   typedef value_type &reference;
   typedef const value_type &const_reference;
   typedef Allocator allocator_type;
-  typedef T* pointer;
-  typedef const T* const_pointer;
+  typedef T *pointer;
+  typedef const T *const_pointer;
 
   small_vector() = default;
 
@@ -76,9 +76,7 @@ public:
     size_ = rhs.size();
   }
 
-  allocator_type get_allocator() const noexcept {
-    return heap_.get_allocator();
-  }
+  allocator_type get_allocator() const noexcept { return heap_.get_allocator(); }
 
   reference at(size_type pos) {
     if (size_ < N) {
