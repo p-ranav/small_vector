@@ -15,7 +15,7 @@ TEST_CASE("Sizing/Resizing in small vector of ints" * test_suite("sizing")) {
   a.resize(20);
   REQUIRE(a.size() == 20);
   std::size_t i = 0; 
-  for (auto j = 6; j < a.size(); j++) {
+  for (std::size_t j = 6; j < a.size(); j++) {
     REQUIRE(a[j] == 0);
     i += 1;
   }

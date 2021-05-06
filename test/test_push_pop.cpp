@@ -11,7 +11,7 @@ TEST_CASE("Pushing into a small vector" * test_suite("push_back")) {
   }
   REQUIRE(a.size() == 9);
   std::size_t j = 0;
-  for (int i = 0; i < a.size(); i++, j++) {
+  for (std::size_t i = 0; i < a.size(); i++, j++) {
     REQUIRE(a[i] == i + 1);
   }
   REQUIRE(j == 9);

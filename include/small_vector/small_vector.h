@@ -63,7 +63,8 @@ public:
   small_vector &operator=(small_vector &&rhs) {
     stack_ = std::move(rhs.stack_);
     heap_ = std::move(rhs.heap_);
-    size_ = std::move(rhs.size_);
+    size_ = rhs.size_;
+    rhs.size_ = 0;
     return *this;
   }
 
@@ -211,6 +212,7 @@ public:
       // if so, move back to stack
       if (size_ < N) {
         std::move(heap_.begin(), heap_.end(), stack_.begin());
+        heap_.clear();
       }
     }
   }
